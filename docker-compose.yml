@@ -1,0 +1,60 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel-app
+        container_name: laravel_app
+        volumes:
+            - .:/var/www
+        ports:
+            - "9000:9000"
+        networks:
+            - app-network
+        environment:
+            DB_CONNECTION: ${DB_CONNECTION}
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            APP_ENV: ${APP_ENV}
+            APP_DEBUG: ${APP_DEBUG}
+            APP_URL: ${APP_URL}
+        depends_on:
+            - mysql
+            - nginx
+        # command: >
+        #     sh -c "php artisan migrate"
+
+    mysql:
+        image: mysql:8.0
+        container_name: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - app-network
+
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        volumes:
+            - .:/var/www
+            - ./nginx/laravel.conf:/etc/nginx/sites-available/laravel
+        ports:
+            - "80:80"
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mysql_data:
+        driver: local
