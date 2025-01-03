@@ -1,35 +1,37 @@
-# Usar una imagen base oficial de PHP
 FROM php:8.4-fpm
 
-# Instalar dependencias necesarias
+# Install common php extension dependencies
 RUN apt-get update && apt-get install -y \
+    libfreetype-dev \
+    libjpeg62-turbo-dev \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
+    zlib1g-dev \
     libzip-dev \
-    git \
     unzip \
-    curl \
     nodejs \
     npm \
-    nginx \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install zip pdo pdo_mysql
 
-# Instalar extensiones de PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo pdo_mysql
-
-# Configurar el directorio de trabajo
+# Set the working directory
+COPY . /var/www
 WORKDIR /var/www
 
-# Copiar los archivos del proyecto al contenedor
-COPY . .
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage
 
-# Instalar Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# install composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# Instalar dependencias de Composer
-RUN composer install --optimize-autoloader --no-dev
+# copy composer.json to workdir & install dependencies
+COPY composer.json ./
+RUN composer install
 
-# Instalar dependencias de NPM (si las tienes en package.json)
+COPY package.json ./
 RUN npm install && npm run build
+
+EXPOSE 9000
+
+# Set the default command to run php-fpm
+CMD ["php-fpm"]
