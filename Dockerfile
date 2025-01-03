@@ -33,16 +33,3 @@ RUN composer install --optimize-autoloader --no-dev
 
 # Instalar dependencias de NPM (si las tienes en package.json)
 RUN npm install && npm run build
-
-# Exponer el puerto en el que el servidor de PHP correrá
-EXPOSE 9000
-
-# Copiar configuración de Nginx al contenedor
-COPY ./nginx.conf /etc/nginx/sites-available/laravel
-RUN ln -s /etc/nginx/sites-available/laravel /etc/nginx/sites-enabled/
-
-# Exponer puerto de Nginx (puerto 80)
-EXPOSE 80
-
-# Ejecutar Nginx y PHP-FPM en paralelo
-CMD service nginx start && php-fpm
