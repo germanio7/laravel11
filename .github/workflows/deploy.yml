@@ -32,7 +32,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest  # Reemplaza con tu nombre de repositorio y tag
+        tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
 
     # Configurar SSH para acceder al VPS
     - name: Set up SSH
@@ -48,11 +48,16 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ./docker-compose.yml
-        target: /var/app/  # Copia el archivo al directorio /var/app
+        target: /var/app/
+
+    # Cargar variables de entorno desde el secret ENV
+    - name: Create .env file from secret
+      run: echo "${{ secrets.ENV }}" > .env
 
     # Desplegar en el VPS usando SSH
     - name: Deploy to VPS
       run: |
+        scp .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/.env
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
           cd /var/app
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
