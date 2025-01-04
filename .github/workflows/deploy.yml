@@ -48,7 +48,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ./docker-compose.yml
-        target: /var/app/docker-compose.yml  # Ajusta la ruta de destino si es necesario
+        target: /var/app/  # Copia el archivo al directorio /var/app
 
     # Desplegar en el VPS usando SSH
     - name: Deploy to VPS
