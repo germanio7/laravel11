@@ -23,6 +23,12 @@ services:
             - db
         ports:
             - "9000:9000"
+        command: sh -c "
+            php artisan migrate --force &&
+            php artisan optimize:clear &&
+            php artisan storage:link &&
+            chown -R www-data:www-data /var/www/storage &&
+            php-fpm"
 
     db:
         image: mysql:8.0
