@@ -57,7 +57,7 @@ jobs:
     # Desplegar en el VPS usando SSH
     - name: Deploy to VPS
       run: |
-        scp .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/.env
+        scp -o StrictHostKeyChecking=no .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/.env
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
           cd /var/app
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
