@@ -43,6 +43,7 @@ jobs:
     # Desplegar en el VPS usando SSH
     - name: Deploy to VPS
       run: |
+        scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/docker-compose.yml
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
           cd /var/app
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
