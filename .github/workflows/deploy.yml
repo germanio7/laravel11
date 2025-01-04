@@ -32,7 +32,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: username/repository:latest  # Reemplaza con tu nombre de repositorio y tag
+        tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest  # Reemplaza con tu nombre de repositorio y tag
 
     # Configurar SSH para acceder al VPS
     - name: Set up SSH
@@ -43,7 +43,7 @@ jobs:
     # Desplegar en el VPS usando SSH
     - name: Deploy to VPS
       run: |
-        ssh -o StrictHostKeyChecking=no user@your_vps_ip << 'EOF'
-          docker pull username/repository:latest
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
           docker compose up -d --build
         EOF
