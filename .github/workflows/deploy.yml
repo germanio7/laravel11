@@ -48,7 +48,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ./docker-compose.yml
-        target: /var/app/
+        target: /var/app/docker-compose.yml
 
     # Cargar variables de entorno desde el secret ENV
     - name: Create .env file from secret
