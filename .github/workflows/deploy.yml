@@ -7,16 +7,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy laravel app
-        uses: appleboy/ssh-action@v0.1.2
-        with:
-          host: ${{secrets.VPS_IP}}
-          key: ${{secrets.SSH_PRIVATE_KEY}}
-          username: ${{secrets.SSH_PRIVATE_KEY}}
+      # - name: Deploy laravel app
+      #   uses: appleboy/ssh-action@v0.1.2
+      #   with:
+      #     host: ${{secrets.VPS_IP}}
+      #     key: ${{secrets.SSH_PRIVATE_KEY}}
+      #     username: ${{secrets.SSH_PRIVATE_KEY}}
 
-          script: |
+      #     script: |
+      #       cd /var/app/ 
+      #       docker compose down
+      #       git fetch && git reset --hard "origin/main"
+      #       docker-compose up -d --build
+      #       echo "codebase update is done";
+
+      # Desplegar en el VPS usando SSH
+      - name: Deploy to VPS
+        run: |
+          scp -o StrictHostKeyChecking=no .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/.env
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
             cd /var/app/ 
             docker compose down
             git fetch && git reset --hard "origin/main"
             docker-compose up -d --build
             echo "codebase update is done";
+          EOF
