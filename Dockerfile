@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm
 
 # Install common PHP extension dependencies and other tools in one layer to reduce image size
 RUN apt-get update && apt-get install -y --no-install-recommends \
