@@ -29,11 +29,8 @@ jobs:
       run: |
         scp -o StrictHostKeyChecking=no .env ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/var/app/.env
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
-          # cd /var/app
-          # docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
-          # docker compose up -d --build
           cd /var/app/ 
           docker compose down
           git fetch && git reset --hard "origin/main"
-          docker compose up -d --build
+          docker compose -f docker-compose.prod.yml up -d --build
         EOF
